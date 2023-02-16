@@ -33,3 +33,5 @@ const placeSchema = new Schema({
 })
 
 const Place = model<IPlace>("Place", placeSchema);
+
+export default Place;

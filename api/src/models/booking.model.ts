@@ -33,3 +33,5 @@ const bookingSchema = new Schema({
 })
 
 const Booking = model<IBooking>("Booking", bookingSchema);
+
+export default Booking;

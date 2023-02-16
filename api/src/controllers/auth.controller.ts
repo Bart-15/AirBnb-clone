@@ -25,7 +25,7 @@ export async function signUp(
     try {
         //check user
         const user = await findUserByEmail(email);
-        if(user) throw new AppError(400, 'Email is already taken')
+        if(user) throw new AppError(400, 'Email is already taken');
         
         const hashedPass = bcrypt.hashSync(password, 10);
 
@@ -33,7 +33,7 @@ export async function signUp(
             name,
             email,
             password:hashedPass
-        })
+        });
 
         res.status(200).json({
             success: true,
@@ -41,7 +41,7 @@ export async function signUp(
             newUser
         });
     }catch(e) {
-        next(e)
+        next(e);
     }
 }
 
@@ -73,9 +73,9 @@ export async function login(
                 success:true,
                 token: token,
                 message:"You have logedin."
-            })
-    } catch(e) {
-        next(e)
+            });
+    }catch(e) {
+        next(e);
     }
 }
 
@@ -83,17 +83,17 @@ export async function logout(
     req: Request, 
     res: Response, 
     next: NextFunction
-    ) {
+    ){
     try {
         if(req.cookies['jwt']){
-            res.clearCookie('jwt').status(200).json({message:"You have logged out."})
+            res.clearCookie('jwt').status(200).json({message:"You have logged out."});
         } else {
             res.status(401).json({
                 error: 'Invalid jwt'
-            })
+            });
         }
     }catch(e) {
-        res.send(500).send("Server Error");
+        next(e);
     } 
 }
 
@@ -112,9 +112,8 @@ export async function profile(
         res.status(200).json({
             success: true,
             user: profile,
-        })
-
-    } catch(e) {
-        console.log(e)
+        });
+    }catch(e) {
+        next(e);
     }
 }

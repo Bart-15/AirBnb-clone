@@ -10,7 +10,7 @@ const validateResource = (schema: AnyZodObject) => async(req: Request, res: Resp
         })
         return next();
     }catch(error: any){
-        return res.status(400).json(error)
+        return res.status(400).json(error);
     }
 }
 

@@ -72,6 +72,7 @@ export async function login(
             .status(200).json({
                 success:true,
                 token: token,
+                payload,
                 message:"You have logedin."
             });
     }catch(e) {
@@ -86,7 +87,10 @@ export async function logout(
     ){
     try {
         if(req.cookies['jwt']){
-            res.clearCookie('jwt').status(200).json({message:"You have logged out."});
+            res.clearCookie('jwt').status(200).json({
+                success:true,
+                message:"You have logged out."
+            });
         } else {
             res.status(401).json({
                 error: 'Invalid jwt'

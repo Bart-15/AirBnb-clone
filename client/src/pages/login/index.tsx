@@ -1,32 +1,41 @@
-import { useEffect, useState } from 'react';
+import { useState, useContext } from 'react';
+import { useRouter } from 'next/router';
 import { AxiosError } from 'axios';
-import { axiosPublic, Error } from '@/utils/axios';
+import { axiosPrivate, axiosPublic, Error } from '@/utils/axios';
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TLogin } from "../types/auth.types";
 import Link from "next/link";
+import { AuthContext } from '@/context/authContext';
 
 const Login = () => {
+    const router = useRouter();
     const [errMessage, setErrMessage] = useState<string | null>(null);
+
+    const {setAuthUser} = useContext(AuthContext);
 
     const initVal = { email:'', password:'' };
     const { register, reset, formState: { errors }, handleSubmit } = useForm<TLogin>({defaultValues: initVal});
 
 
     const onSubmit: SubmitHandler<TLogin> = async(formVal) => {
-        setErrMessage("");
+        errMessage && setErrMessage("");
 
         // e.preventDefault();
         /**
          * If you want to add other validation place here
         */
         try {
-
-        }catch(e) {
+            const {data: { success, payload } } = await axiosPrivate.post('/login', formVal);
+            if(success){
+                setAuthUser(payload);
+                router.push('/');
+            } 
+        }catch(err) {
             const error = err as AxiosError<Error>;
-            setErrMessage(error?.response?.data.message!)
+            setErrMessage(error?.response?.data.message!);
+            setTimeout(() => setErrMessage(""),1000);
         }
 
-        console.log(formVal);
     }
     
     return ( 
@@ -41,6 +50,7 @@ const Login = () => {
                     <input id="password" type="password" {...register("password", { required: "Password is required" })} className="py-2 px-3 rounded-full w-full border border-gray-200 focus:border-gray-400 focus:outline-none" placeholder="Password" />
                     { errors.password && <span className="text-sm text-red-600 ml-2">{errors.password.message}</span> }
                 </div>
+                {errMessage && (<span className="text-red-600 text-sm ml-2">{errMessage}</span>)}
                 <div className="text-right mb-4">
                     <a href="#" className="text-sm hover:underline">Forgot your password?</a>
                 </div>

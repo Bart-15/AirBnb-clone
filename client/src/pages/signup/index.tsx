@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { AxiosError } from 'axios';
 import { axiosPublic, Error } from '@/utils/axios';
 import { useForm, SubmitHandler } from "react-hook-form";
-import { TSignup } from "../types/auth.types";
+import { TSignup } from "../../types/auth.types";
 
 const SignUp = () => {
     const [errMessage, setErrMessage] = useState<string | null>(null);

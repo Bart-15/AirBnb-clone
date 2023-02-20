@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { AxiosError } from 'axios';
 import { axiosPrivate, axiosPublic, Error } from '@/utils/axios';
 import { useForm, SubmitHandler } from "react-hook-form";
-import { TLogin } from "../types/auth.types";
+import { TLogin } from "../../types/auth.types";
 import Link from "next/link";
 import { AuthContext } from '@/context/authContext';
 

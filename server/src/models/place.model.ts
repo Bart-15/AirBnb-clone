@@ -12,6 +12,9 @@ const placeSchema = new Schema({
     address: {
         type:String
     },
+    thumbnail: {
+        type:String
+    },
     photos:{
         type:[String]
     },

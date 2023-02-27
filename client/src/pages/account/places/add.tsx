@@ -1,42 +1,92 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { useRouter } from 'next/router';
 import { AuthContext } from "@/context/authContext";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TFormPlaceInput } from '@/types/forms.types';
+import { axiosPrivate } from '@/utils/axios';
 
 const initVal = {
     title:'',
     address:'',
     checkIn:'',
     checkOut:'',
-    maxGuests:0,
-    price:0
+    maxGuests:'',
+    extraInfo:'',
+    price:''
 }
 
 const AddPlace = () => {
     const router = useRouter();
 
+    const [fileImage, setFileImage] = useState<File | null | any>(null);
+    
     const { ready, authUser, setAuthUser } = useContext(AuthContext);
-
+    
     const { register, reset, formState: { errors }, handleSubmit } = useForm<TFormPlaceInput>({defaultValues: initVal});
-
-
+    
+    
     if(!ready) {
         return (<p className="text-center mt-20">Loading ...</p>)
     }
-
+    
     if(ready && !authUser) router.push('/login')
-
+    
     const onSubmit: SubmitHandler<TFormPlaceInput> = async(formVal) => {
-
+        
         // e.preventDefault();
         /**
          * If you want to add other validation place here
         */
 
-        console.log(formVal)
-    }
+        const photos: any = ['sample', 'hello'];
+        if(!fileImage) {
+            return alert('thumbnail is required')
+        }
 
+        let formData = new FormData();
+
+        /**
+         * address
+            : 
+            "asdas"
+            checkIn
+            : 
+            "08:30"
+            checkOut
+            : 
+            "10:30"
+            maxGuests
+            : 
+            "1"
+            price
+            : 
+            "1"
+            title
+            : 
+            "asdasd"
+                    */
+        formData.append("title", formVal.title);
+        formData.append("photos", photos);
+        formData.append('thumbnail', fileImage);
+        formData.append('extraInfo', formVal.extraInfo);
+        formData.append("address", formVal.address);
+        formData.append("checkIn", formVal.checkIn);
+        formData.append("checkOut", formVal.address);
+        formData.append("price", formVal.price);
+        formData.append("maxGuests", formVal.maxGuests);
+
+        console.log(formData);
+        console.log(formVal);
+
+        try {
+            const res = await axiosPrivate.post('/place', formData);
+            console.log(res);
+        } catch (e) {
+            console.log(e)
+        }
+    }
+    
+    console.log(fileImage)
     return ( 
         <section>
             <button className="bg-primary py-2 px-6 rounded-full text-white my-10 text-xs md:text-base inline-flex gap-2" onClick={() => router.back()}>
@@ -46,7 +96,7 @@ const AddPlace = () => {
                 Go back
             </button>
             <div>
-                <form onSubmit={handleSubmit(onSubmit)}>
+                <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
                     <div className="grid md:grid-cols-2 md:gap-6">
                         <div className="w-full group mb-6">
                             <label htmlFor="Title" className="font-medium text-sm md:text-lg">Title</label>
@@ -57,6 +107,13 @@ const AddPlace = () => {
                             <label htmlFor="Address" className="font-medium text-sm md:text-lg">Address</label>
                             <input type="text" id="address" {...register("address", { required: "Address is required" })} className="py-2 px-3 rounded-md w-full border border-gray-200 focus:border-gray-400 focus:outline-none mt-1" placeholder="Address"/>
                             { errors.address && <span className="text-sm text-red-600 ml-2">{errors.address.message}</span> }
+                        </div>
+                    </div>
+                    <div>
+                        <div className="w-full group mb-6">
+                                <label htmlFor="ExtraInfo" className="font-medium text-sm md:text-lg">ExtraInfo</label>
+                                <input type="text" id="extraInfo" {...register("extraInfo", { required: "ExtraInfo is required" })} className="py-2 px-3 rounded-md w-full border border-gray-200 focus:border-gray-400 focus:outline-none mt-1" placeholder="ExtraInfo"/>
+                                { errors.extraInfo && <span className="text-sm text-red-600 ml-2">{errors.extraInfo.message}</span> }
                         </div>
                     </div>
                     <div className="mb-6">
@@ -79,13 +136,17 @@ const AddPlace = () => {
                         </div>
                         <div>
                             <label htmlFor="maxGuests" className="font-medium text-sm md:text-lg -mb-1">Max number of guests</label>
-                            <input type="number" {...register("maxGuests", { required: "Max guests is required", pattern: { value: /^[1-9]+$/, message: 'Please enter a valid price'} })} id="maxGuests" className="w-full py-2 px-3 rounded-md border border-gray-200 focus:border-gray-400 focus:outline-none" />
+                            <input type="text" {...register("maxGuests", { required: "Max guests is required", pattern: { value: /^[1-9]+$/, message: 'Please enter a valid price'} })} id="maxGuests" className="w-full py-2 px-3 rounded-md border border-gray-200 focus:border-gray-400 focus:outline-none" />
                             { errors.maxGuests && <span className="text-sm text-red-600 ml-2">{errors.maxGuests.message}</span> }
                         </div>
                         <div>
                             <label htmlFor="price" className="font-medium text-sm md:text-lg -mb-1">Price</label>
-                            <input type="number" {...register("price", { required: "Price is required", pattern: { value: /^[1-9]+$/, message: 'Please enter a valid price'}} )} id="price" className="w-full py-2 px-3 rounded-md border border-gray-200 focus:border-gray-400 focus:outline-none" />
+                            <input type="text" {...register("price", { required: "Price is required", pattern: { value: /^[1-9]+$/, message: 'Please enter a valid price'}} )} id="price" className="w-full py-2 px-3 rounded-md border border-gray-200 focus:border-gray-400 focus:outline-none" />
                             { errors.price && <span className="text-sm text-red-600 ml-2">{errors.price.message}</span> }
+                        </div>
+                        <div>
+                            <label htmlFor="price" className="font-medium text-sm md:text-lg -mb-1">Thumbnail</label>
+                            <input type="file" className="w-full py-2 px-3 rounded-md border border-gray-200 focus:border-gray-400 focus:outline-none" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFileImage(e.target.files)}/>
                         </div>
                     </div>
                     <button type="submit" className="primary my-4">Save</button>

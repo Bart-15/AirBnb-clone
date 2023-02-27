@@ -1,10 +1,12 @@
 import express, {Request} from "express";
+import path from "path";
 import config from './config/config';
 import connectDb from "./db/dbConnection";
 import errHandler from './middleware/errHandler';
 import bodyParser from 'body-parser';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
+
 
 import cors from 'cors';
 
@@ -24,6 +26,7 @@ app.use(bodyParser.json());
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({limit:"30mb", extended: true}));
 app.use(cors({origin:"http://localhost:3000", credentials:true}));
+app.use('./public/uploads', express.static(path.join(__dirname, './public/uploads')))
 
 app.use(`${config.API}`, auth);
 app.use(`${config.API}`, booking);

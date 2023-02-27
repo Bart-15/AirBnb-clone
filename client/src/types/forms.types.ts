@@ -3,6 +3,7 @@ export type TFormPlaceInput = {
     address:string;
     checkIn:string;
     checkOut:string;
-    maxGuests:number;
-    price:number;
+    extraInfo:string;
+    maxGuests:string;
+    price:string;
 }

@@ -14,14 +14,24 @@ export async function addPlace(
 
         const { title, address, photos, extraInfo, checkOut, maxGuests, price } = req.body;
 
-        const place = await createPlaces({ owner: authUser.id, title, address, photos, extraInfo, checkOut, maxGuests, price });
-        
-        res.status(200).json({
-            success:true,
-            data:place,
-        });
+        // const fileName = req?.file?.filename
+        // const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`
+        // const intCheckOut = parseInt(checkOut); 
+        // const intMaxGuests =  parseInt(maxGuests);
+        // const intPrice =  parseInt(price);
+
+        // console.log({
+        //     fileName,
+        //     basePath,
+        //     intCheckOut,
+        //     intMaxGuests,
+        //     intPrice
+        // })
+        const files = req.file as Express.Multer.File;
+
+        console.log("this is the file", files)
     }catch(e) {
-        next(e)
+        console.log(e);
     }
 }
 

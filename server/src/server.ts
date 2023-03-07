@@ -24,16 +24,18 @@ connectDb();
 // body parser
 app.use(bodyParser.json());
 app.use(cookieParser())
+
+// error handler for catching errors;
+app.use(errHandler)
+
+app.use('/public/uploads', express.static(path.join(__dirname, '../public/uploads')))
 app.use(bodyParser.urlencoded({limit:"30mb", extended: true}));
 app.use(cors({origin:"http://localhost:3000", credentials:true}));
-app.use('./public/uploads', express.static(path.join(__dirname, './public/uploads')))
 
 app.use(`${config.API}`, auth);
 app.use(`${config.API}`, booking);
 app.use(`${config.API}`, place);
 
-// error handler for catching errors;
-app.use(errHandler)
 
 // passposrt
 app.use(passport.initialize());

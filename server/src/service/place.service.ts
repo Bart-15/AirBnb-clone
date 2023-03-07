@@ -17,6 +17,10 @@ export function getPlaceById(id:string){
     return Place.findById(id);
 }
 
+export function updatePlaceImages(id:string, images: string[]){
+    return Place.findByIdAndUpdate(id, {images:images})
+}
+
 export function deletePlaceById(id:string){
     return Place.findByIdAndDelete(id);
 }

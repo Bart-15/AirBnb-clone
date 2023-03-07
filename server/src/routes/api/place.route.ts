@@ -4,7 +4,7 @@ import passport from 'passport';
 import multer from 'multer';
 import { createPlaceSchema } from '../../schema/place.schema';
 import {
-    addPlace, destroyPlace, getPlace, getPlaces, getUserPlaces, updatePlace
+    addPlace, destroyPlace, getPlace, getPlaces, getUserPlaces, updatePlace, uploadMultipleImages
 } from '../../controllers/place.controller';
 
 const router = express.Router();
@@ -25,7 +25,7 @@ const storage = multer.diskStorage({
             error = null;
         }
 
-        cb(error, './public/uploads')
+        cb(error, 'public/uploads')
     },
     filename : function(req, file, cb) {
         const fileName = file.originalname.split(' ').join('-')
@@ -50,7 +50,13 @@ router.get('/place/:id',  getPlace);
 // @route    /place
 // @desc     Create Place
 // @access   Private
-router.post('/place', passport.authenticate('jwt', {session:false}), uploadOptions.single('thumbnail'), addPlace);
+router.post('/place', passport.authenticate('jwt', {session:false}), validateResource(createPlaceSchema), addPlace);
+
+// @route    /place
+// @desc     Upload multiple images
+// @access   Private
+router.put('/upload-images/:id', passport.authenticate('jwt', {session:false}), uploadOptions.array('images', 10), uploadMultipleImages);
+
 
 // @route    /user-places
 // @desc     Get Place index

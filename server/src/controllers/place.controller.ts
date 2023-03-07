@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction  } from "express";
+import { Types } from 'mongoose';
 import { CreatePlaceInput } from "../schema/place.schema";
 import { TUserDoc } from '../types/user.types';
 import { AppError } from "../middleware/errHandler";
-import { createPlaces, getPlacesByUser, placesIndex, getPlaceById, deletePlaceById } from "../service/place.service";
+import { createPlaces, getPlacesByUser, placesIndex, getPlaceById, deletePlaceById, updatePlaceImages } from "../service/place.service";
 
 export async function addPlace(
     req: Request<{}, {}, CreatePlaceInput>, 
@@ -12,26 +13,17 @@ export async function addPlace(
     try {
         const authUser = req.user as TUserDoc;
 
-        const { title, address, photos, extraInfo, checkOut, maxGuests, price } = req.body;
+        const { title, address, images, extraInfo, checkOut, maxGuests, price } = req.body;
 
-        // const fileName = req?.file?.filename
-        // const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`
-        // const intCheckOut = parseInt(checkOut); 
-        // const intMaxGuests =  parseInt(maxGuests);
-        // const intPrice =  parseInt(price);
+        const place = await createPlaces({ owner: authUser.id, title, address, images, extraInfo, checkOut, maxGuests, price });
 
-        // console.log({
-        //     fileName,
-        //     basePath,
-        //     intCheckOut,
-        //     intMaxGuests,
-        //     intPrice
-        // })
-        const files = req.file as Express.Multer.File;
+        res.status(200).json({
+            success:true,
+            data:place,
+        });
 
-        console.log("this is the file", files)
     }catch(e) {
-        console.log(e);
+        next(e);
     }
 }
 
@@ -96,7 +88,7 @@ export async function updatePlace(
     ){
     try{
         const authUser = req.user as TUserDoc;
-        const { title, address, photos, extraInfo, checkOut, maxGuests, price } = req.body;
+        const { title, address, images, extraInfo, checkOut, maxGuests, price } = req.body;
 
         const place = await getPlaceById(req.params.id);
 
@@ -104,7 +96,7 @@ export async function updatePlace(
         
         if(place?.owner.toString() !== authUser.id) throw new AppError(401, "Unauthorized");
 
-        place.set({ title, address, photos, extraInfo, checkOut, maxGuests, price });
+        place.set({ title, address, images, extraInfo, checkOut, maxGuests, price });
 
         await place.save();
         
@@ -115,6 +107,45 @@ export async function updatePlace(
     }catch(e) {
         next(e)
     }
+}
+
+export async function uploadMultipleImages(
+    req: Request<{id: string}, {}, {}>, 
+    res: Response, 
+    next: NextFunction
+    ){
+    try {
+        if(!Types.ObjectId.isValid(req.params.id)) throw new AppError(400, "Invalid id");
+
+        const authUser = req.user as TUserDoc;
+
+        const place = await getPlaceById(req.params.id);
+
+        if(!place) return res.status(404).json({success: false, message:"Place not found"});
+        
+        if(place?.owner.toString() !== authUser.id) throw new AppError(401, "Unauthorized");
+
+        const imagePaths: string[] = [];
+        const files = req.files as Express.Multer.File[];
+        const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`
+        
+        if(files) {
+            files.map(file => {
+                imagePaths.push(`${basePath}${file.filename}`);
+            })
+        }
+
+        place.set({ images: imagePaths });
+        await place.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Images Uploaded successfully."
+        });
+    }catch(e) {
+        console.log(e);
+    }
+
 }
 
 export async function destroyPlace(

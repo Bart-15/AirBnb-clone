@@ -15,14 +15,20 @@ const placeSchema = new Schema({
     images:{
         type:[String]
     },
-    extraInfo:{
+    description:{
         type:String
     },
+    small_description: {
+        type:String
+    },
+    perks: {
+        type:[String]
+    },
     checkIn:{
-        type:Number
+        type:String
     },
     checkOut:{
-        type:Number
+        type:String
     },
     maxGuests:{
         type:Number

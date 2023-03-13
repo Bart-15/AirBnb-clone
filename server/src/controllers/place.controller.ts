@@ -13,9 +13,9 @@ export async function addPlace(
     try {
         const authUser = req.user as TUserDoc;
 
-        const { title, address, images, extraInfo, checkOut, maxGuests, price } = req.body;
+        const { title, address, images, description, small_description, perks, checkOut, maxGuests, price } = req.body;
 
-        const place = await createPlaces({ owner: authUser.id, title, address, images, extraInfo, checkOut, maxGuests, price });
+        const place = await createPlaces({ owner: authUser.id, title, address, perks, images, description, small_description, checkOut, maxGuests, price });
 
         res.status(200).json({
             success:true,
@@ -88,7 +88,7 @@ export async function updatePlace(
     ){
     try{
         const authUser = req.user as TUserDoc;
-        const { title, address, images, extraInfo, checkOut, maxGuests, price } = req.body;
+        const { title, address, images, description, small_description, perks, checkOut, maxGuests, price } = req.body;
 
         const place = await getPlaceById(req.params.id);
 
@@ -96,7 +96,7 @@ export async function updatePlace(
         
         if(place?.owner.toString() !== authUser.id) throw new AppError(401, "Unauthorized");
 
-        place.set({ title, address, images, extraInfo, checkOut, maxGuests, price });
+        place.set({ owner: authUser.id, title, address, perks, images, description, small_description, checkOut, maxGuests, price  });
 
         await place.save();
         

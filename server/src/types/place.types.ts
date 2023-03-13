@@ -3,9 +3,11 @@ export interface IPlace {
     title: string;
     address:string;
     images:string[];
-    extraInfo:string;
-    checkIn:number;
-    checkOut:number;
+    perks:string[],
+    description:string;
+    small_description:string;
+    checkIn:string;
+    checkOut:string;
     maxGuests:number;
     price:number;
 }

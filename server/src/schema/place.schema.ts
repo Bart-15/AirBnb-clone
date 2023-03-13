@@ -6,8 +6,11 @@ export const createPlaceSchema = object({
         title: string().trim().min(1, {message: "Title is required."}),
         address: string().trim().min(1, {message: "Address is required."}),
         images: string({required_error: 'Photos required'}).array().optional(),
-        extraInfo: string().trim().min(1, {message: "ExtraInfo is required."}),
-        checkOut: number(),
+        perks: string({required_error: 'Photos required'}).array().optional(),
+        description: string().trim().min(1, {message: "Description is required."}),
+        small_description: string().trim().min(1, {message: "Small description is required."}),
+        checkIn: string().trim().min(1, {message: "Checkin is required."}),
+        checkOut: string().trim().min(1, {message: "Checkin is required."}),
         maxGuests: number().positive(),
         price: number().positive(),
     })

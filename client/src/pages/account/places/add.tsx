@@ -4,6 +4,8 @@ import { AuthContext } from "@/context/authContext";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TFormPlaceInput } from '@/types/forms.types';
 import { axiosPrivate } from '@/utils/axios';
+import { perksOptions } from '@/global/const';
+import MultiCheckBox from '@/components/MultiCheckbox';
 
 const initVal = {
     title:'',
@@ -11,7 +13,8 @@ const initVal = {
     checkIn:'',
     checkOut:'',
     maxGuests:'',
-    extraInfo:'',
+    small_description:'',
+    description:'',
     price:''
 }
 
@@ -19,6 +22,7 @@ const AddPlace = () => {
     const router = useRouter();
 
     const [fileImage, setFileImage] = useState<File | null | any>(null);
+    const [selectedPerks, setSelectedPerks] = useState<string[]>([])
     
     const { ready, authUser, setAuthUser } = useContext(AuthContext);
     
@@ -33,60 +37,16 @@ const AddPlace = () => {
     
     const onSubmit: SubmitHandler<TFormPlaceInput> = async(formVal) => {
         
-        // e.preventDefault();
-        /**
-         * If you want to add other validation place here
-        */
-
-        const photos: any = ['sample', 'hello'];
-        if(!fileImage) {
-            return alert('thumbnail is required')
-        }
-
-        let formData = new FormData();
-
-        /**
-         * address
-            : 
-            "asdas"
-            checkIn
-            : 
-            "08:30"
-            checkOut
-            : 
-            "10:30"
-            maxGuests
-            : 
-            "1"
-            price
-            : 
-            "1"
-            title
-            : 
-            "asdasd"
-                    */
-        formData.append("title", formVal.title);
-        formData.append("photos", photos);
-        formData.append('thumbnail', fileImage);
-        formData.append('extraInfo', formVal.extraInfo);
-        formData.append("address", formVal.address);
-        formData.append("checkIn", formVal.checkIn);
-        formData.append("checkOut", formVal.address);
-        formData.append("price", formVal.price);
-        formData.append("maxGuests", formVal.maxGuests);
-
-        console.log(formData);
-        console.log(formVal);
+        let newData = { ...formVal, perks:selectedPerks, maxGuests: parseInt(formVal.maxGuests), price: parseInt(formVal.price) }
 
         try {
-            const res = await axiosPrivate.post('/place', formData);
-            console.log(res);
-        } catch (e) {
-            console.log(e)
+            const { data } = await axiosPrivate.post('/place', newData);
+            if(data.success) return router.push('/account/places')
+        }catch(e){
+            console.log(e);
         }
     }
     
-    console.log(fileImage)
     return ( 
         <section>
             <button className="bg-primary py-2 px-6 rounded-full text-white my-10 text-xs md:text-base inline-flex gap-2" onClick={() => router.back()}>
@@ -109,19 +69,18 @@ const AddPlace = () => {
                             { errors.address && <span className="text-sm text-red-600 ml-2">{errors.address.message}</span> }
                         </div>
                     </div>
-                    <div>
-                        <div className="w-full group mb-6">
-                                <label htmlFor="ExtraInfo" className="font-medium text-sm md:text-lg">ExtraInfo</label>
-                                <input type="text" id="extraInfo" {...register("extraInfo", { required: "ExtraInfo is required" })} className="py-2 px-3 rounded-md w-full border border-gray-200 focus:border-gray-400 focus:outline-none mt-1" placeholder="ExtraInfo"/>
-                                { errors.extraInfo && <span className="text-sm text-red-600 ml-2">{errors.extraInfo.message}</span> }
-                        </div>
+                    <div className="w-full group mb-6">
+                        <label htmlFor="Small_description" className="font-medium text-sm md:text-lg">Small Description</label>
+                        <input type="text" id="small_description" {...register("small_description", { required: "Small_description is required" })} className="py-2 px-3 rounded-md w-full border border-gray-200 focus:border-gray-400 focus:outline-none mt-1" placeholder="Small Description"/>
+                        { errors.small_description && <span className="text-sm text-red-600 ml-2">{errors.small_description.message}</span> }
                     </div>
-                    <div className="mb-6">
-                        <label htmlFor="Photos" className="font-medium text-sm md:text-lg">Photos</label>
-                        <div className="flex flex-row gap-4 mt-1">
-                            <input type="text" id="photos" className="py-2 px-3 rounded-md border border-gray-200 focus:border-gray-400 focus:outline-none" placeholder='Add using a link' />
-                            <button className="bg-gray-200 text-gray-800 rounded-full text-xs w-32 font-medium">Add photo</button>
-                        </div>
+                    <div className="w-full group mb-6">
+                        <label htmlFor="Description" className="font-medium text-sm md:text-lg">Description</label>
+                        <textarea rows={4} id="description" {...register("description", { required: "Description is required" })} className="py-2 px-3 rounded-md w-full border border-gray-200 focus:border-gray-400 focus:outline-none mt-1" placeholder="Description"/>
+                        { errors.description && <span className="text-sm text-red-600 ml-2">{errors.description.message}</span> }
+                    </div>
+                    <div className="grid mt-2 gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-6 mb-6">
+                        <MultiCheckBox options={perksOptions} selected={selectedPerks} onChange={setSelectedPerks}/>
                     </div>
                     <div className="grid gap-2 grid-cols-2 md:grid-cols-4 md:gap-6">
                         <div>
@@ -143,10 +102,6 @@ const AddPlace = () => {
                             <label htmlFor="price" className="font-medium text-sm md:text-lg -mb-1">Price</label>
                             <input type="text" {...register("price", { required: "Price is required", pattern: { value: /^[1-9]+$/, message: 'Please enter a valid price'}} )} id="price" className="w-full py-2 px-3 rounded-md border border-gray-200 focus:border-gray-400 focus:outline-none" />
                             { errors.price && <span className="text-sm text-red-600 ml-2">{errors.price.message}</span> }
-                        </div>
-                        <div>
-                            <label htmlFor="price" className="font-medium text-sm md:text-lg -mb-1">Thumbnail</label>
-                            <input type="file" className="w-full py-2 px-3 rounded-md border border-gray-200 focus:border-gray-400 focus:outline-none" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFileImage(e.target.files)}/>
                         </div>
                     </div>
                     <button type="submit" className="primary my-4">Save</button>

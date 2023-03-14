@@ -9,3 +9,9 @@ export type TFormPlaceInput = {
     maxGuests:string;
     price:string;
 }
+
+export type TPerks = {
+    _id:string;
+    name:string;
+    path:string;
+}

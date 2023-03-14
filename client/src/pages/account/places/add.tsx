@@ -2,9 +2,10 @@ import { useContext, useState } from 'react';
 import { useRouter } from 'next/router';
 import { AuthContext } from "@/context/authContext";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { TFormPlaceInput } from '@/types/forms.types';
+import { TFormPlaceInput, TPerks } from '@/types/forms.types';
 import { axiosPrivate } from '@/utils/axios';
-import { perksOptions } from '@/global/const';
+import { fetchPerks } from '@/queries/place.queries';
+import { useQuery } from 'react-query';
 import MultiCheckBox from '@/components/MultiCheckbox';
 
 const initVal = {
@@ -21,20 +22,25 @@ const initVal = {
 const AddPlace = () => {
     const router = useRouter();
 
-    const [fileImage, setFileImage] = useState<File | null | any>(null);
-    const [selectedPerks, setSelectedPerks] = useState<string[]>([])
+    const [ selectedPerks, setSelectedPerks ] = useState<string[]>([])
     
-    const { ready, authUser, setAuthUser } = useContext(AuthContext);
+    const { ready, authUser } = useContext(AuthContext);
     
     const { register, reset, formState: { errors }, handleSubmit } = useForm<TFormPlaceInput>({defaultValues: initVal});
     
+    const { data: perksOptions } = useQuery<TPerks[], Error>(["perks"], () => fetchPerks(), {
+        enabled:!!authUser,
+        keepPreviousData:true,
+        refetchOnWindowFocus:false,
+    })
     
     if(!ready) {
         return (<p className="text-center mt-20">Loading ...</p>)
     }
     
-    if(ready && !authUser) router.push('/login')
+    if(ready && !authUser) return router.push('/login')
     
+
     const onSubmit: SubmitHandler<TFormPlaceInput> = async(formVal) => {
         
         let newData = { ...formVal, perks:selectedPerks, maxGuests: parseInt(formVal.maxGuests), price: parseInt(formVal.price) }
@@ -80,16 +86,16 @@ const AddPlace = () => {
                         { errors.description && <span className="text-sm text-red-600 ml-2">{errors.description.message}</span> }
                     </div>
                     <div className="grid mt-2 gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-6 mb-6">
-                        <MultiCheckBox options={perksOptions} selected={selectedPerks} onChange={setSelectedPerks}/>
+                        <MultiCheckBox options={perksOptions as TPerks[]} selected={selectedPerks} onChange={setSelectedPerks}/>
                     </div>
                     <div className="grid gap-2 grid-cols-2 md:grid-cols-4 md:gap-6">
                         <div>
-                            <label htmlFor="checkIn" className="font-medium text-sm md:text-lg -mb-1">Check in time</label>
-                            <input {...register("checkIn", { required: "Check in time is required" })} type="time" id="checkIn" className="w-full py-2 px-3 rounded-md border border-gray-200 focus:border-gray-400 focus:outline-none" placeholder='Checkin' />
+                            <label htmlFor="checkIn" className="font-medium text-sm md:text-lg -mb-1">Check in</label>
+                            <input {...register("checkIn", { required: "Check in is required" })} type="time" id="checkIn" className="w-full py-2 px-3 rounded-md border border-gray-200 focus:border-gray-400 focus:outline-none" placeholder='Checkin' />
                             { errors.checkIn && <span className="text-sm text-red-600 ml-2">{errors.checkIn.message}</span> }
                         </div>
                         <div>
-                            <label htmlFor="checkOut" className="font-medium text-sm md:text-lg -mb-1">Check out time</label>
+                            <label htmlFor="checkOut" className="font-medium text-sm md:text-lg -mb-1">Check out</label>
                             <input type="time" {...register("checkOut", { required: "Check out time is required" })} id="checkOut" className="w-full py-2 px-3 rounded-md border border-gray-200 focus:border-gray-400 focus:outline-none" placeholder='Checkout' />
                             { errors.checkOut && <span className="text-sm text-red-600 ml-2">{errors.checkOut.message}</span> }
                         </div>

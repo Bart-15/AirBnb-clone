@@ -1,32 +1,37 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { AuthContext } from "@/context/authContext";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { TFormPlaceInput, TPerks } from '@/types/forms.types';
 import { axiosPrivate } from '@/utils/axios';
-import { fetchPerks } from '@/queries/place.queries';
+import { fetchPerks, fetchPlace } from '@/queries/place.queries';
 import { useQuery } from 'react-query';
 import MultiCheckBox from '@/components/MultiCheckbox';
 
-const initVal = {
-    title:'',
-    address:'',
-    checkIn:'',
-    checkOut:'',
-    maxGuests:'',
-    small_description:'',
-    description:'',
-    price:''
-}
+// const initVal = {
+//     title:'',
+//     address:'',
+//     checkIn:'',
+//     checkOut:'',
+//     maxGuests:'',
+//     small_description:'',
+//     description:'',
+//     price:''
+// }
 
 const AddPlace = () => {
     const router = useRouter();
-
+    const { id } = router.query;
+    
     const [ selectedPerks, setSelectedPerks ] = useState<string[]>([])
     
     const { ready, authUser } = useContext(AuthContext);
     
-    const { register, reset, formState: { errors }, handleSubmit } = useForm<TFormPlaceInput>({defaultValues: initVal});
+    const {data: place} = useQuery<TFormPlaceInput, Error>(['place'], () => fetchPlace(id), {
+        enabled:!!id,
+        keepPreviousData:true,
+        refetchOnWindowFocus:false,
+    });
     
     const { data: perksOptions } = useQuery<TPerks[], Error>(["perks"], () => fetchPerks(), {
         enabled:!!authUser,
@@ -34,25 +39,34 @@ const AddPlace = () => {
         refetchOnWindowFocus:false,
     })
     
+    const { register, setValue, reset, formState: { errors }, handleSubmit } = useForm<TFormPlaceInput>();
+
+    useEffect(() => {
+        if(place) {
+            Object.entries(place).forEach(([key, value]) => setValue(key as keyof TFormPlaceInput, value));
+            setSelectedPerks(place.perks)
+        }
+    }, [place, setValue])
+    
     if(!ready) {
         return (<p className="text-center mt-20">Loading ...</p>)
     }
     
     if(ready && !authUser) return router.push('/login')
     
-
-    const onSubmit: SubmitHandler<TFormPlaceInput> = async(formVal) => {
+    const onSubmit = async(formVal: TFormPlaceInput) => {
         
         let newData = { ...formVal, perks:selectedPerks, maxGuests: parseInt(formVal.maxGuests), price: parseInt(formVal.price) }
 
         try {
-            const { data } = await axiosPrivate.post('/place', newData);
-            if(data.success) return router.push('/account/places')
+            const { data } = await axiosPrivate.patch(`/place/${id}`, newData);
+            if(data.success) return router.push('/account/place')
         }catch(e){
             console.log(e);
         }
     }
     
+    console.log(place)
     return ( 
         <section>
             <button className="bg-primary py-2 px-6 rounded-full text-white my-10 text-xs md:text-base inline-flex gap-2" onClick={() => router.back()}>
@@ -62,7 +76,7 @@ const AddPlace = () => {
                 Go back
             </button>
             <div>
-                <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
+                <form onSubmit={handleSubmit(onSubmit)}>
                     <div className="grid md:grid-cols-2 md:gap-6">
                         <div className="w-full group mb-6">
                             <label htmlFor="Title" className="font-medium text-sm md:text-lg">Title</label>
@@ -77,7 +91,7 @@ const AddPlace = () => {
                     </div>
                     <div className="w-full group mb-6">
                         <label htmlFor="Small_description" className="font-medium text-sm md:text-lg">Small Description</label>
-                        <input type="text" id="small_description" {...register("small_description", { required: "Small_description is required" })} className="py-2 px-3 rounded-md w-full border border-gray-200 focus:border-gray-400 focus:outline-none mt-1" placeholder="Small Description"/>
+                        <input type="text" id="small_description" {...register("small_description", { required: "Small description is required" })} className="py-2 px-3 rounded-md w-full border border-gray-200 focus:border-gray-400 focus:outline-none mt-1" placeholder="Small Description"/>
                         { errors.small_description && <span className="text-sm text-red-600 ml-2">{errors.small_description.message}</span> }
                     </div>
                     <div className="w-full group mb-6">
@@ -85,8 +99,11 @@ const AddPlace = () => {
                         <textarea rows={4} id="description" {...register("description", { required: "Description is required" })} className="py-2 px-3 rounded-md w-full border border-gray-200 focus:border-gray-400 focus:outline-none mt-1" placeholder="Description"/>
                         { errors.description && <span className="text-sm text-red-600 ml-2">{errors.description.message}</span> }
                     </div>
-                    <div className="grid mt-2 gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-6 mb-6">
-                        <MultiCheckBox options={perksOptions as TPerks[]} selected={selectedPerks} onChange={setSelectedPerks}/>
+                    <div>
+                        <label htmlFor="Perks" className="font-medium text-sm md:text-lg">Perks</label>
+                        <div className="grid mt-2 gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-6 mb-6">
+                            <MultiCheckBox options={perksOptions as TPerks[]} selected={selectedPerks} onChange={setSelectedPerks}/>
+                        </div>
                     </div>
                     <div className="grid gap-2 grid-cols-2 md:grid-cols-4 md:gap-6">
                         <div>
@@ -110,7 +127,7 @@ const AddPlace = () => {
                             { errors.price && <span className="text-sm text-red-600 ml-2">{errors.price.message}</span> }
                         </div>
                     </div>
-                    <button type="submit" className="primary my-4">Save</button>
+                    <button type="submit" className="primary my-4">Update</button>
                 </form>
             </div>
         </section>

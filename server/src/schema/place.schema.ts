@@ -1,4 +1,4 @@
-import {object, string, TypeOf, array, number, any} from "zod";
+import { object, string, TypeOf, array, number } from "zod";
 
 
 export const createPlaceSchema = object({
@@ -16,5 +16,13 @@ export const createPlaceSchema = object({
     })
 });
 
+export const createPerksSchema = object({
+    body: object({
+        name:string().trim().min(1, {message: "Name is required."}),
+        path:string().trim().min(1, {message: "D is required."})
+    })
+})
+
 export type CreatePlaceInput = TypeOf<typeof createPlaceSchema>["body"];
+export type CreatePerksInput = TypeOf<typeof createPerksSchema>["body"];
 

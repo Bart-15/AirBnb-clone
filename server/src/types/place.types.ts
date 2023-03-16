@@ -11,3 +11,8 @@ export interface IPlace {
     maxGuests:number;
     price:number;
 }
+
+export interface IPerks {
+    name:string;
+    path:string;
+}

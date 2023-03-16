@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { TPerks } from "@/types/forms.types";
 
 type MultiCheckBoxProps = {
@@ -9,6 +9,10 @@ type MultiCheckBoxProps = {
 
 const MultiCheckBox = ({options, selected, onChange}: MultiCheckBoxProps) => {
     const [checkedAll, setCheckedAll] = useState<boolean>(false);
+
+    useEffect(() => {
+        if(options?.length === selected.length) return setCheckedAll(true);
+    }, [options])
 
     function handleClick(event:  React.FormEvent<HTMLInputElement>): void{
         let uptList : string[] = [...selected]
@@ -26,7 +30,6 @@ const MultiCheckBox = ({options, selected, onChange}: MultiCheckBoxProps) => {
     }
 
     const toggleSelectAll = () => {
-        console.log("toggle me");
         setCheckedAll(!checkedAll);
     
         let updatedList: string[] = [];
@@ -47,7 +50,7 @@ const MultiCheckBox = ({options, selected, onChange}: MultiCheckBoxProps) => {
     return ( 
         <>
             <label className="border p-4 flex flex-wrap text-xs md:text-sm rounded-2xl gap-2 items-center cursor-pointer">
-                <input type="checkbox" value={checkedAll} checked={checkedAll} name="selectAll" onChange={(e) => toggleSelectAll()}/>
+                <input type="checkbox" checked={checkedAll} name="selectAll" onChange={(e) => toggleSelectAll()}/>
                 <span>Select All</span>
             </label>
             {
@@ -57,7 +60,6 @@ const MultiCheckBox = ({options, selected, onChange}: MultiCheckBoxProps) => {
                         <input 
                         type="checkbox" 
                         name={checkBox._id}
-                        value={checkBox._id}
                         checked={selected.includes(checkBox._id) }   
                         onChange={(e) => handleClick(e)}
                         />

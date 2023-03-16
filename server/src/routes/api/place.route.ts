@@ -55,7 +55,7 @@ router.post('/place', passport.authenticate('jwt', {session:false}), validateRes
 // @route    /place
 // @desc     Upload multiple images
 // @access   Private
-router.put('/upload-images/:id', passport.authenticate('jwt', {session:false}), uploadOptions.array('images', 10), uploadMultipleImages);
+router.patch('/upload-images/:id', passport.authenticate('jwt', {session:false}), uploadOptions.array('images', 10), uploadMultipleImages);
 
 
 // @route    /user-places
@@ -66,7 +66,7 @@ router.get('/user-place', passport.authenticate('jwt', {session:false}), getUser
 // @route    /user-places
 // @desc     Get Place index
 // @access   Private
-router.put('/place/:id', passport.authenticate('jwt', {session:false}), updatePlace)
+router.patch('/place/:id', passport.authenticate('jwt', {session:false}), updatePlace)
 
 // @route    /place/:id
 // @desc     Delete place by id

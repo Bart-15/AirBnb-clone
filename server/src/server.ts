@@ -15,6 +15,7 @@ import cors from 'cors';
 import auth from './routes/api/auth.route';
 import booking from './routes/api/booking.route';
 import place from './routes/api/place.route';
+import perks from './routes/api/perks.route';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -35,7 +36,7 @@ app.use(cors({origin:"http://localhost:3000", credentials:true}));
 app.use(`${config.API}`, auth);
 app.use(`${config.API}`, booking);
 app.use(`${config.API}`, place);
-
+app.use(`${config.API}`, perks);
 
 // passposrt
 app.use(passport.initialize());

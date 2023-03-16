@@ -1,11 +1,12 @@
 export type TFormPlaceInput = {
-    description: any;
-    small_description: any;
+    _id?:string;
+    description: string;
+    small_description: string;
     title: string;
     address:string;
     checkIn:string;
     checkOut:string;
-    extraInfo:string;
+    perks:string[];
     maxGuests:string;
     price:string;
 }

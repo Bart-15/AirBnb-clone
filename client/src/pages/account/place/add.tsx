@@ -47,7 +47,7 @@ const AddPlace = () => {
 
         try {
             const { data } = await axiosPrivate.post('/place', newData);
-            if(data.success) return router.push('/account/places')
+            if(data.success) return router.push('/account/place')
         }catch(e){
             console.log(e);
         }

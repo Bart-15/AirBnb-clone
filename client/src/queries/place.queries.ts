@@ -1,5 +1,5 @@
 import { TPerks, TFormPlaceInput as TPlace } from '@/types/forms.types';
-import { axiosPrivate } from '@/utils/axios';
+import { axiosPrivate, axiosPublic } from '@/utils/axios';
 
 
 export async function fetchPerks(): Promise<TPerks[]> {
@@ -15,4 +15,9 @@ export async function fetchUserPlace(): Promise<TPlace[]> {
 export async function fetchPlace(id: string | string[] | undefined) : Promise<TPlace> {
     const { data: { place } } = await axiosPrivate.get(`/place/${id}`);
     return place;
+}
+
+export async function fetchPlaces(): Promise<TPlace[]> {
+    const {data: { places } } = await axiosPublic('/place');
+    return places;
 }

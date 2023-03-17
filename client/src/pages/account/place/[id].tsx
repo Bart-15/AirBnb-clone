@@ -8,17 +8,6 @@ import { fetchPerks, fetchPlace } from '@/queries/place.queries';
 import { useQuery } from 'react-query';
 import MultiCheckBox from '@/components/MultiCheckbox';
 
-// const initVal = {
-//     title:'',
-//     address:'',
-//     checkIn:'',
-//     checkOut:'',
-//     maxGuests:'',
-//     small_description:'',
-//     description:'',
-//     price:''
-// }
-
 const AddPlace = () => {
     const router = useRouter();
     const { id } = router.query;

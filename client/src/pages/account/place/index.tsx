@@ -7,14 +7,14 @@ import Link from "next/link";
 import AccountNav from "@/components/AcountNav";
 import { fetchUserPlace } from "@/queries/place.queries";
 import useModal from "@/hooks/useModal";
-import Modal from "@/components/modal";
+import Modal from "@/components/Modal";
 import UploadPhotos from "@/components/UploadPhotos";
 
 
 const Places = () => {
 
     const router = useRouter();
-    const { ready, authUser, setAuthUser } = useContext(AuthContext);
+    const { ready, authUser } = useContext(AuthContext);
     const { isShown, toggle } = useModal();
     const [placeId, setPlaceId] = useState<string>("");
 
@@ -39,14 +39,7 @@ const Places = () => {
         toggle();
         setPlaceId(id)
     }
-    // const Content = () => {
-    //     return (
-    //         <>
-    //         <>Hey, Im a model.<br />Hey, Im a model<br />Hey, Im a model<br />Hey, Im a model<br />Hey, Im a model<br />Hey, Im a model<br />Hey, Im a model<br />Hey, Im a model</>
-    //         </>
-    //     )
-    // }
-    // const content = ;
+
 
     return ( 
         <div className="mt-20">

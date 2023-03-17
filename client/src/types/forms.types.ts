@@ -5,6 +5,7 @@ export type TFormPlaceInput = {
     title: string;
     address:string;
     checkIn:string;
+    images?:string[];
     checkOut:string;
     perks:string[];
     maxGuests:string;

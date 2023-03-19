@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { AuthContext } from "@/context/authContext";
 import { useForm } from "react-hook-form";
@@ -7,6 +7,9 @@ import { axiosPrivate } from '@/utils/axios';
 import { fetchPerks } from '@/queries/place.queries';
 import { useQuery } from 'react-query';
 import MultiCheckBox from '@/components/MultiCheckbox';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+
 
 const initVal = {
     title:'',
@@ -26,8 +29,12 @@ const AddPlace = () => {
     
     const { ready, authUser } = useContext(AuthContext);
     
-    const { register, reset, formState: { errors }, handleSubmit } = useForm<TFormPlaceInput>({defaultValues: initVal});
+    const { register, watch, setValue, formState: { errors }, handleSubmit } = useForm<TFormPlaceInput>({defaultValues:initVal});
     
+    useEffect(() => {
+        register("description", { required: "Description in is required", minLength: 15 });
+    }, [register])
+
     const { data: perksOptions } = useQuery<TPerks[], Error>(["perks"], () => fetchPerks(), {
         enabled:!!authUser,
         keepPreviousData:true,
@@ -40,6 +47,11 @@ const AddPlace = () => {
     
     if(ready && !authUser) return router.push('/login')
     
+    const onEditorStateChange = (editorState: string) => {
+        setValue("description", editorState)
+    };
+
+    const editorContent = watch("description");
 
     const onSubmit = async(formVal: TFormPlaceInput) => {
         
@@ -82,7 +94,11 @@ const AddPlace = () => {
                     </div>
                     <div className="w-full group mb-6">
                         <label htmlFor="Description" className="font-medium text-sm md:text-lg">Description</label>
-                        <textarea rows={4} id="description" {...register("description", { required: "Description is required" })} className="py-2 px-3 rounded-md w-full border border-gray-200 focus:border-gray-400 focus:outline-none mt-1" placeholder="Description"/>
+                            <ReactQuill
+                                theme="snow"
+                                value={editorContent}
+                                onChange={onEditorStateChange}
+                            />
                         { errors.description && <span className="text-sm text-red-600 ml-2">{errors.description.message}</span> }
                     </div>
                     <div>
@@ -109,7 +125,7 @@ const AddPlace = () => {
                         </div>
                         <div>
                             <label htmlFor="price" className="font-medium text-sm md:text-lg -mb-1">Price</label>
-                            <input type="text" {...register("price", { required: "Price is required", pattern: { value: /^[1-9]+$/, message: 'Please enter a valid price'}} )} id="price" className="w-full py-2 px-3 rounded-md border border-gray-200 focus:border-gray-400 focus:outline-none" />
+                            <input type="text" {...register("price", { required: "Price is required", pattern: { value: /^[0-9]*$/, message: 'Please enter a valid price'}} )} id="price" className="w-full py-2 px-3 rounded-md border border-gray-200 focus:border-gray-400 focus:outline-none" />
                             { errors.price && <span className="text-sm text-red-600 ml-2">{errors.price.message}</span> }
                         </div>
                     </div>

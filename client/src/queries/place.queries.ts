@@ -13,7 +13,7 @@ export async function fetchUserPlace(): Promise<TPlace[]> {
 }
 
 export async function fetchPlace(id: string | string[] | undefined) : Promise<TPlace> {
-    const { data: { place } } = await axiosPrivate.get(`/place/${id}`);
+    const { data: { place } } = await axiosPublic.get(`/place/${id}`);
     return place;
 }
 

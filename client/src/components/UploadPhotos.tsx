@@ -28,7 +28,7 @@ const UploadPhotos = (props: {id:string, hide: () => void;}) => {
                 let file = images![i].file;
                 formData.append('images', file);
             }
-            const { data } = await axiosPrivate.patch(`/upload-images/${props.id}`, formData);
+            const { data } = await axiosPrivate.patch(`/upload-images/${props.id}`,  );
             if(data.success) return props.hide();
         }catch(e){
             console.log(e);

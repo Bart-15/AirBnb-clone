@@ -7,6 +7,9 @@ import { axiosPrivate } from '@/utils/axios';
 import { fetchPerks, fetchPlace } from '@/queries/place.queries';
 import { useQuery } from 'react-query';
 import MultiCheckBox from '@/components/MultiCheckbox';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+
 
 const AddPlace = () => {
     const router = useRouter();
@@ -28,7 +31,11 @@ const AddPlace = () => {
         refetchOnWindowFocus:false,
     })
     
-    const { register, setValue, reset, formState: { errors }, handleSubmit } = useForm<TFormPlaceInput>();
+    const { register, watch, setValue, formState: { errors }, handleSubmit } = useForm<TFormPlaceInput>();
+
+    useEffect(() => {
+        register("description", { required: "Description in is required", minLength: 15 });
+    }, [register])
 
     useEffect(() => {
         if(place) {
@@ -43,6 +50,12 @@ const AddPlace = () => {
     
     if(ready && !authUser) return router.push('/login')
     
+    const onEditorStateChange = (editorState: string) => {
+        setValue("description", editorState)
+    };
+
+    const editorContent = watch("description");
+
     const onSubmit = async(formVal: TFormPlaceInput) => {
         
         let newData = { ...formVal, perks:selectedPerks, maxGuests: parseInt(formVal.maxGuests), price: parseInt(formVal.price) }
@@ -85,7 +98,11 @@ const AddPlace = () => {
                     </div>
                     <div className="w-full group mb-6">
                         <label htmlFor="Description" className="font-medium text-sm md:text-lg">Description</label>
-                        <textarea rows={4} id="description" {...register("description", { required: "Description is required" })} className="py-2 px-3 rounded-md w-full border border-gray-200 focus:border-gray-400 focus:outline-none mt-1" placeholder="Description"/>
+                            <ReactQuill
+                                theme="snow"
+                                value={editorContent}
+                                onChange={onEditorStateChange}
+                            />
                         { errors.description && <span className="text-sm text-red-600 ml-2">{errors.description.message}</span> }
                     </div>
                     <div>
@@ -112,7 +129,7 @@ const AddPlace = () => {
                         </div>
                         <div>
                             <label htmlFor="price" className="font-medium text-sm md:text-lg -mb-1">Price</label>
-                            <input type="text" {...register("price", { required: "Price is required", pattern: { value: /^[1-9]+$/, message: 'Please enter a valid price'}} )} id="price" className="w-full py-2 px-3 rounded-md border border-gray-200 focus:border-gray-400 focus:outline-none" />
+                            <input type="text" {...register("price", { required: "Price is required", pattern: { value: /^[0-9]*$/, message: 'Please enter a valid price'}} )} id="price" className="w-full py-2 px-3 rounded-md border border-gray-200 focus:border-gray-400 focus:outline-none" />
                             { errors.price && <span className="text-sm text-red-600 ml-2">{errors.price.message}</span> }
                         </div>
                     </div>

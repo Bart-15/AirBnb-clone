@@ -17,3 +17,14 @@ export type TPerks = {
     name:string;
     path:string;
 }
+
+export type TBookingInput = {
+    fullName:string;
+    place:string;
+    checkIn:string;
+    checkOut:string;
+    name:string;
+    phone:string;
+    numberOfGuests:number | null;
+    price:number;
+}

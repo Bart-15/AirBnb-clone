@@ -68,7 +68,6 @@ const AddPlace = () => {
         }
     }
     
-    console.log(place)
     return ( 
         <section>
             <button className="bg-primary py-2 px-6 rounded-full text-white my-10 text-xs md:text-base inline-flex gap-2" onClick={() => router.back()}>

@@ -6,5 +6,6 @@ export interface IBooking {
     checkOut:string;
     name:string;
     phone:string;
+    numberOfGuests:number;
     price:number;
 }

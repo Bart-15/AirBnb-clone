@@ -25,6 +25,6 @@ export type TBookingInput = {
     checkOut:string;
     name:string;
     phone:string;
-    numberOfGuests:number | null;
+    numberOfGuests:number;
     price:number;
 }

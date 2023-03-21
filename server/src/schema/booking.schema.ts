@@ -8,6 +8,7 @@ export const createBookingSchema = object({
         checkOut:  string().regex(ISO_DATE_REGEX , 'Date must be a valid ISO date'),
         name: string().trim().min(1, {message: "Name is required."}),
         phone: string().trim().min(1, {message: "Phone is required."}),
+        numberOfGuests: number().positive(),
         price: number().positive(),
     })
 });

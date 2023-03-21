@@ -12,9 +12,9 @@ export async function addBooking(
     try {
         const authUser = req.user as TUserDoc;
 
-        const { place, checkIn, checkOut, name, phone, price } = req.body;
+        const { place, checkIn,  checkOut, numberOfGuests, name, phone, price } = req.body;
 
-        const booking =  await createBooking({ place, checkIn, checkOut, name, phone, price, user:authUser.id });
+        const booking =  await createBooking({ place, checkIn, checkOut, numberOfGuests, name, phone, price, user:authUser.id });
 
         res.status(200).json({
             success: true,

@@ -19,12 +19,17 @@ export type TPerks = {
 }
 
 export type TBookingInput = {
-    fullName:string;
-    place:string;
+    _id:string;
+    user:string;
+    name:string;
+    place:string | TFormPlaceInput;
     checkIn:string;
     checkOut:string;
-    name:string;
     phone:string;
     numberOfGuests:number;
     price:number;
+}
+
+export interface IBooking extends TBookingInput  {
+    place: TFormPlaceInput
 }

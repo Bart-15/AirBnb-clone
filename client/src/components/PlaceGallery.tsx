@@ -51,7 +51,7 @@ const PlaceGallery: FunctionComponent<TPlaceGallery> = ({
                 <div className="grid gap-2 grid-cols-[2fr_1fr] rounded-3xl overflow-hidden">
                     { placeImg![0] && (
                         <div>
-                            <Image onClick={() => setShowGallery(true)} className="aspect-square cursor-pointer object-cover w-full" height="100" width="100" src={placeImg![0]} alt=""/>
+                            <Image onClick={() => setShowGallery(true)} className="aspect-square cursor-pointer object-cover w-full" height="100" width="100" src={placeImg![0]} alt="" priority/>
                         </div>
                     )}
                     <div className="grid">

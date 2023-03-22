@@ -8,7 +8,7 @@ import noImage from '../../../assets/images/no-image.png'
 
 export default function Places() {
 
-    const {data: places, isLoading} = useQuery<TPlaces[], Error>(['place'], () => fetchPlaces(), {
+    const {data: places, isLoading} = useQuery<TPlaces[], Error>(['places'], () => fetchPlaces(), {
         enabled:true,
         keepPreviousData:true,
         refetchOnWindowFocus:false,

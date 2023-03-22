@@ -26,7 +26,7 @@ const Account = () => {
         <section className="mt-20">
             <AccountNav />
             <div className="text-center">
-                <p className="mb-2">Loged in as {authUser?.name} ({authUser?.email})</p>
+                <p className="mb-2">Loged in as {authUser?.name} {authUser?.email ? `(${authUser?.email})` : '' }</p>
                 <button className="bg-primary w-32 py-2 rounded-full text-white" onClick={handleLogout}>Logout</button>
             </div>
         </section>

@@ -6,7 +6,6 @@ export type IModalProps = {
     hide: () => void;
     modalContent: React.ReactNode;
     header: string;
-  
 }
 
 const Modal: FunctionComponent<IModalProps> = ({

@@ -25,7 +25,7 @@ export async function signUp(
     try {
         //check user
         const user = await findUserByEmail(email);
-        if(user) throw new AppError(400, 'Email is already taken');
+        if(user) return res.status(400).json({success: false, message:"Email is already taken."})
         
         const hashedPass = bcrypt.hashSync(password, 10);
 
@@ -54,7 +54,7 @@ export async function login(
     const { email, password} = req.body;
     try {
         const user = await findUserByEmail(email);
-        if(!user) throw new AppError(404, 'User not found.');
+        if(!user) return res.status(404).json({success: false, message:"User not found"});
         
 
         const comparePass = await bcrypt.compare(password, user.password);
@@ -111,7 +111,7 @@ export async function profile(
 
         const profile = await findUserById(user.id);
         
-        if(!profile) throw new AppError(404, 'User not found.');
+        if(!profile) return res.status(404).json({success: false, message:"User not found"});
 
         res.status(200).json({
             success: true,

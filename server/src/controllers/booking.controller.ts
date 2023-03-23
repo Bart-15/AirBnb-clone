@@ -53,7 +53,7 @@ export async function destroyBooking(
         const authUser = req.user as TUserDoc;
         const booking = await findBookingById(req.params.id);
 
-        if(!booking) throw new AppError(404, "Booking not found.");
+        if(!booking) return res.status(404).json({success: false, message:"Booking not found"});
 
         if(booking?.user.toString()  !== authUser.id) throw new AppError(401, "Unauthorized");
 

@@ -70,7 +70,7 @@ export async function getPlace(
     ){
     try {
         const place = await getPlaceById(req.params.id);
-        if(!place) throw new AppError(404, "Place not found");
+        if(!place) res.status(404).json({success: false, message:"Place not found"});
 
         return res.status(200).json({
             success: true,
@@ -92,9 +92,9 @@ export async function updatePlace(
 
         const place = await getPlaceById(req.params.id);
 
-        if(!place) throw new AppError(404, "Place not found.");
+        if(!place) return res.status(404).json({success: false, message:"Place not found"});
         
-        if(place?.owner.toString() !== authUser.id) throw new AppError(401, "Unauthorized");
+        if(place?.owner.toString() !== authUser.id) return res.status(401).json({success: false, message:"Unauthorized"});
 
         place.set({ owner: authUser.id, title, address, perks, images, description, small_description, checkOut, checkIn, maxGuests, price  });
 
@@ -123,7 +123,7 @@ export async function uploadMultipleImages(
 
         if(!place) return res.status(404).json({success: false, message:"Place not found"});
         
-        if(place?.owner.toString() !== authUser.id) throw new AppError(401, "Unauthorized");
+        if(place?.owner.toString() !== authUser.id) return res.status(401).json({success: false, message:"Unauthorized"});
 
         const imagePaths: string[] = [];
         const files = req.files as Express.Multer.File[];
@@ -159,7 +159,7 @@ export async function destroyPlace(
         const place = await getPlaceById(req.params.id);
         if(!place) throw new AppError(404, "Place not found.");
 
-        if(place?.owner.toString()  !== authUser.id) throw new AppError(401, "Unauthorized");
+        if(place?.owner.toString()  !== authUser.id) return res.status(401).json({success: false, message:"Unauthorized"});
 
         await deletePlaceById(req.params.id);
 

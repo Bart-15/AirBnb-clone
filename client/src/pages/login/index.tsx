@@ -9,6 +9,7 @@ import { AuthContext } from '@/context/authContext';
 
 const Login = () => {
     const router = useRouter();
+
     const [errMessage, setErrMessage] = useState<string | null>(null);
 
     const {setAuthUser} = useContext(AuthContext);

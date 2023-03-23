@@ -42,7 +42,7 @@ export async function destroyPerks(
     ){
     try {
         const perks = await getPerksById(req.params.id);
-        if(!perks) throw new AppError(404, "Perks not found.");
+        if(!perks) return res.status(404).json({success: false, message:"Perks not found"});
 
         await deletePerks(req.params.id);
 

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { axiosPrivate } from "@/utils/axios";
 import Image from 'next/image';
+import { AxiosError } from 'axios';
+import { Error } from '@/types/forms.types';
 
 type FileObj = {
     id:string;
@@ -9,7 +11,8 @@ type FileObj = {
 
 const UploadPhotos = (props: {id:string, hide: () => void; existingImgs?: string[]}) => {
     const [images, setImages] = useState<FileObj[]>([]);
-    
+    const [error, setError] = useState<Error | undefined>();
+
     function handleChange(event: React.ChangeEvent<HTMLInputElement>){
         let fileList = event.target.files;
 
@@ -35,8 +38,9 @@ const UploadPhotos = (props: {id:string, hide: () => void; existingImgs?: string
             }
             const { data } = await axiosPrivate.patch(`/upload-images/${props.id}`, formData);
             if(data.success) return props.hide();
-        }catch(e){
-            console.log(e);
+        }catch(err){
+            const error = err as AxiosError<Error>;
+            setError(error?.response?.data);
         }
     }
     

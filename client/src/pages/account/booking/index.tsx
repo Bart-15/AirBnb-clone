@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { useQuery } from 'react-query';
 import AccountNav from "@/components/AcountNav";
 import { AuthContext } from '@/context/authContext';
@@ -6,10 +6,12 @@ import { useRouter } from 'next/router';
 import { IBooking } from '@/types/forms.types';
 import { fetchUserBookings } from '@/queries/booking.queries';
 import { axiosPrivate } from '@/utils/axios';
+import { AxiosError } from 'axios';
 
 const Bookings = () => {
     const router = useRouter();
     const { ready, authUser, setAuthUser } = useContext(AuthContext)
+    const [error, setError] = useState<AxiosError | null>(null)
 
     const { data: bookings, refetch } = useQuery<IBooking[], Error>(["bookings"], () => fetchUserBookings(), {
         enabled:!!authUser,
@@ -27,8 +29,9 @@ const Bookings = () => {
         try {
             const {data} = await axiosPrivate.delete(`/booking/${id}`);
             if(data.success) return refetch();
-        }catch(e) {
-            console.log(e);
+        }catch(err) {
+            const error = err as AxiosError<Error>;
+            setError(error);
         }
     }
     return ( 

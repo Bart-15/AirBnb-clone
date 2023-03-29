@@ -41,7 +41,7 @@ const BookingDetails:FunctionComponent<TBookingDetails> = ({
 
         }, [checkIn, checkOut, place?.price]);
         
-        const { register, watch, setValue, formState: { errors }, handleSubmit } = useForm<TBookingInput>({defaultValues:initVal});
+        const { register, formState: { errors }, handleSubmit } = useForm<TBookingInput>({defaultValues:initVal});
         
         if(!place) {
             return null;
@@ -59,7 +59,6 @@ const BookingDetails:FunctionComponent<TBookingDetails> = ({
             try {
                 const { data } = await axiosPrivate.post('/booking', newBooking);
                 if(data.success) return router.push('/account/booking')
-                console.log(data);
             }catch(e){
                 console.log(e);
             }
@@ -84,7 +83,7 @@ const BookingDetails:FunctionComponent<TBookingDetails> = ({
                 <hr className="text-slate-200 mb-4"/>
                 <div className="mb-4">
                     <label htmlFor="numberOfGuests" className="font-semibold">Number of guests:</label>
-                    <input type="number" id="numberOfGuests" {...register("numberOfGuests", { required: "Number of guests is required" })} className="py-2 px-3 rounded-md w-full border border-gray-200 focus:border-gray-400 focus:outline-none mt-1" placeholder="Number of guest"/>
+                    <input type="number" id="numberOfGuests" {...register("numberOfGuests", { required: "Number of guests is required", validate:{ maxxGuests: (data) => data <= parseInt(place?.maxGuests) || `Max guests is ${place?.maxGuests} person only`} })} className="py-2 px-3 rounded-md w-full border border-gray-200 focus:border-gray-400 focus:outline-none mt-1" placeholder="Number of guest"/>
                     { errors.numberOfGuests && <span className="text-sm text-red-600 ml-2">{errors.numberOfGuests.message}</span> }
                 </div>
                 <div className="mb-4">
@@ -94,7 +93,7 @@ const BookingDetails:FunctionComponent<TBookingDetails> = ({
                 </div>
                 <div className="mb-4">
                     <label htmlFor="phone" className="font-semibold">Phone number:</label>
-                    <input type="tel" id="phone"  {...register("phone", { required: "Phone is required" })} className="py-2 px-3 rounded-md w-full border border-gray-200 focus:border-gray-400 focus:outline-none mt-1" placeholder="Phone Number"/>
+                    <input type="tel" id="phone"  {...register("phone", { required: "Phone is required", pattern: { value: /((^(\+)(\d){12}$)|(^\d{11}$))/, message: 'Please enter valid PH number'} })} className="py-2 px-3 rounded-md w-full border border-gray-200 focus:border-gray-400 focus:outline-none mt-1" placeholder="Phone Number"/>
                     { errors.phone && <span className="text-sm text-red-600 ml-2">{errors.phone.message}</span> }
                 </div>
                 <div className="text-center">

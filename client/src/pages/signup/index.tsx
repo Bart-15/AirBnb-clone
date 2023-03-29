@@ -6,7 +6,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { TSignup } from "../../types/auth.types";
 
 const SignUp = () => {
-    const [errMessage, setErrMessage] = useState<string | null>(null);
+    const [error, setError] = useState<Error | undefined>();
     const [isSuccess, setSuccess] = useState<boolean>(false);
 
     const initVal = { name: '', email:'', password:'' };
@@ -14,17 +14,17 @@ const SignUp = () => {
 
 
     const onSubmit: SubmitHandler<TSignup> = async(formVal) => {
-        setErrMessage("");
+        setError(null!)
         try {
             const { data: {success} } = await axiosPublic.post('/signup', formVal);
             if(success) {
                 reset();
                 setSuccess(true);
-                setErrMessage("")
+                setError(null!)
             }
         }catch(err) {
             const error = err as AxiosError<Error>;
-            setErrMessage(error?.response?.data.message!)
+            setError(error?.response?.data);
         }
     }
 
@@ -46,8 +46,8 @@ const SignUp = () => {
                                 { errors.name && <span className="text-sm text-red-600 ml-2">{errors.name.message}</span> }
                             </div>
                             <div className="mb-3">
-                                <input id="email" type="text" onFocus={() => setErrMessage(null)} {...register("email", { required: "Email is required" })} className="py-2 px-3 rounded-full w-full border border-gray-200 focus:border-gray-400 focus:outline-none" placeholder="Email" />
-                                { errors.email ? <span className="text-sm text-red-600 ml-2">{errors.email.message}</span> :  errMessage ? (<span className="text-xs text-red-600 ml-2">{ errMessage }</span>) : '' }
+                                <input id="email" type="text" onFocus={() => setError(null!)} {...register("email", { required: "Email is required" })} className="py-2 px-3 rounded-full w-full border border-gray-200 focus:border-gray-400 focus:outline-none" placeholder="Email" />
+                                { errors.email ? <span className="text-sm text-red-600 ml-2">{errors.email.message}</span> :  error?.message ? (<span className="text-xs text-red-600 ml-2">{ error?.message }</span>) : '' }
                             </div>
                             <div className="mb-4">
                                 <input id="password" type="password" {...register("password", { required: "Password is required" })} className="py-2 px-3 rounded-full w-full border border-gray-200 focus:border-gray-400 focus:outline-none" placeholder="Password" />

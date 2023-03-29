@@ -1,6 +1,7 @@
 import { useQuery } from "react-query";
 import { useRouter } from 'next/router';
 import { fetchPlace } from '@/queries/place.queries';
+import { format24hto12h } from "@/global/const";
 import Head from "next/head";
 import { TFormPlaceInput as TPlace } from '@/types/forms.types';
 import PlaceGallery from "@/components/PlaceGallery";
@@ -35,8 +36,8 @@ const SinglePlace = () => {
                             <div dangerouslySetInnerHTML={{__html: place?.description!}}></div>
                         </div>
                         <div className="my-4">
-                            <p>Check-in: {place?.checkIn}</p>
-                            <p>Check-out: {place?.checkOut}</p>
+                            <p>Check-in: {format24hto12h(place?.checkIn!)}</p>
+                            <p>Check-out: {format24hto12h(place?.checkOut!)}</p>
                             <p>Max number of guests: {place?.maxGuests}</p>
                         </div>
                     </div>

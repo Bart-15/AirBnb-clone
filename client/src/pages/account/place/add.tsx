@@ -1,14 +1,16 @@
 import { useContext, useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { AuthContext } from "@/context/authContext";
 import { useForm } from "react-hook-form";
-import { TFormPlaceInput, TPerks } from '@/types/forms.types';
+import { TFormPlaceInput, TPerks, Error } from '@/types/forms.types';
 import { axiosPrivate } from '@/utils/axios';
 import { fetchPerks } from '@/queries/place.queries';
 import { useQuery } from 'react-query';
 import MultiCheckBox from '@/components/MultiCheckbox';
-import ReactQuill from 'react-quill';
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 import 'react-quill/dist/quill.snow.css';
+import { AxiosError } from 'axios';
 
 
 const initVal = {
@@ -26,13 +28,14 @@ const AddPlace = () => {
     const router = useRouter();
 
     const [ selectedPerks, setSelectedPerks ] = useState<string[]>([])
+    const [error, setError] = useState<Error | undefined>();
     
     const { ready, authUser } = useContext(AuthContext);
     
     const { register, watch, setValue, formState: { errors }, handleSubmit } = useForm<TFormPlaceInput>({defaultValues:initVal});
     
     useEffect(() => {
-        register("description", { required: "Description in is required", minLength: 15 });
+        register("description", { required: "Description is required", minLength: 15 });
     }, [register])
 
     const { data: perksOptions } = useQuery<TPerks[], Error>(["perks"], () => fetchPerks(), {
@@ -60,8 +63,9 @@ const AddPlace = () => {
         try {
             const { data } = await axiosPrivate.post('/place', newData);
             if(data.success) return router.push('/account/place')
-        }catch(e){
-            console.log(e);
+        }catch(err){
+            const error = err as AxiosError<Error>;
+            setError(error?.response?.data);
         }
     }
     
@@ -120,12 +124,12 @@ const AddPlace = () => {
                         </div>
                         <div>
                             <label htmlFor="maxGuests" className="font-medium text-sm md:text-lg -mb-1">Max number of guests</label>
-                            <input type="text" {...register("maxGuests", { required: "Max guests is required", pattern: { value: /^[1-9]+$/, message: 'Please enter a valid price'} })} id="maxGuests" className="w-full py-2 px-3 rounded-md border border-gray-200 focus:border-gray-400 focus:outline-none" />
+                            <input type="text" {...register("maxGuests", { required: "Max guests is required", pattern: { value: /^[0-9]*$/, message: 'Number only'} })} id="maxGuests" className="w-full py-2 px-3 rounded-md border border-gray-200 focus:border-gray-400 focus:outline-none" />
                             { errors.maxGuests && <span className="text-sm text-red-600 ml-2">{errors.maxGuests.message}</span> }
                         </div>
                         <div>
                             <label htmlFor="price" className="font-medium text-sm md:text-lg -mb-1">Price</label>
-                            <input type="text" {...register("price", { required: "Price is required", pattern: { value: /^[0-9]*$/, message: 'Please enter a valid price'}} )} id="price" className="w-full py-2 px-3 rounded-md border border-gray-200 focus:border-gray-400 focus:outline-none" />
+                            <input type="text" {...register("price", { required: "Price is required", pattern: { value: /^[0-9]*$/, message: 'Number only'}} )} id="price" className="w-full py-2 px-3 rounded-md border border-gray-200 focus:border-gray-400 focus:outline-none" />
                             { errors.price && <span className="text-sm text-red-600 ml-2">{errors.price.message}</span> }
                         </div>
                     </div>

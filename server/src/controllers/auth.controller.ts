@@ -2,7 +2,6 @@ import { Request, Response, NextFunction  } from "express";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { TUserDoc } from '../types/user.types';
-import { AppError } from "../middleware/errHandler";
 import {
     CreateUserInput,
     LoginUserInput
@@ -56,9 +55,8 @@ export async function login(
         const user = await findUserByEmail(email);
         if(!user) return res.status(404).json({success: false, message:"User not found"});
         
-
         const comparePass = await bcrypt.compare(password, user.password);
-        if(!comparePass) throw new AppError(404, 'Invalid email or password.');
+        if(!comparePass) return res.status(400).json({success: false, message:"User not found"})
 
         const payload = {
             id: user.id,

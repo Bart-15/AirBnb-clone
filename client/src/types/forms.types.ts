@@ -33,3 +33,8 @@ export type TBookingInput = {
 export interface IBooking extends TBookingInput  {
     place: TFormPlaceInput
 }
+
+export type Error = {
+    success: boolean,
+    message: string
+}

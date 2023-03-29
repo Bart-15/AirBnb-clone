@@ -15,16 +15,12 @@ const Login = () => {
     const {setAuthUser} = useContext(AuthContext);
 
     const initVal = { email:'', password:'' };
-    const { register, reset, formState: { errors }, handleSubmit } = useForm<TLogin>({defaultValues: initVal});
+    const { register, formState: { errors }, handleSubmit } = useForm<TLogin>({defaultValues: initVal});
 
 
-    const onSubmit: SubmitHandler<TLogin> = async(formVal) => {
+    const login: SubmitHandler<TLogin> = async(formVal) => {
         errMessage && setErrMessage("");
 
-        // e.preventDefault();
-        /**
-         * If you want to add other validation place here
-        */
         try {
             const {data: { success, payload } } = await axiosPrivate.post('/login', formVal);
             if(success){
@@ -42,7 +38,7 @@ const Login = () => {
     return ( 
         <section className="mt-10">
             <h1 className="text-2xl md:text-4xl text-center font-semibold">Login</h1>
-            <form className="max-w-md mx-auto mt-4" onSubmit={handleSubmit(onSubmit)}>
+            <form className="max-w-md mx-auto mt-4" onSubmit={handleSubmit(login)}>
                 <div className="mb-3">
                     <input id="email" type="text" {...register("email", { required: "Email is required" })} className="py-2 px-3 rounded-full w-full border border-gray-200 focus:border-gray-400 focus:outline-none" placeholder="Email" />
                     { errors.email && <span className="text-sm text-red-600 ml-2">{errors.email.message}</span> }

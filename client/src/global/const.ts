@@ -12,3 +12,9 @@ export function addCommas(num: number | string) {
 
     return parts.join('.')
 }
+
+export function format24hto12h(time: string) {
+    const [hourString, minute] = time.split(":");
+    const hour = + hourString % 24;
+    return (hour % 12 || 12) + ":" + minute + (hour < 12 ? " AM" : " PM");
+}

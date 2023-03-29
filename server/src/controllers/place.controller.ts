@@ -143,7 +143,7 @@ export async function uploadMultipleImages(
             message: "Images Uploaded successfully."
         });
     }catch(e) {
-        console.log(e);
+        next(e)
     }
 
 }

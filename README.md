@@ -1,8 +1,8 @@
 # AirBnb-clone MERN (Full Typescript)
 
 
-https://user-images.githubusercontent.com/73633889/232280779-ca1e7574-f68c-4900-8832-8d420eb5ce4a.mp4
 
+[bnb.webm](https://user-images.githubusercontent.com/73633889/232281066-4c8a2c31-2edc-411b-9d45-ba31524d88d0.webm)
 
 ## Tech I use to build this app
 1. JWT with passport 

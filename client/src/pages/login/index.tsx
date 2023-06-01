@@ -1,39 +1,17 @@
-import { useState, useContext } from 'react';
-import { useRouter } from 'next/router';
-import { AxiosError } from 'axios';
-import { axiosPrivate, axiosPublic, Error } from '@/utils/axios';
+import { useContext } from 'react';
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TLogin } from "../../types/auth.types";
 import Link from "next/link";
 import { AuthContext } from '@/context/authContext';
 
 const Login = () => {
-    const router = useRouter();
 
-    const [errMessage, setErrMessage] = useState<string | null>(null);
-
-    const {setAuthUser} = useContext(AuthContext);
+    const {login:handleLogin, errMessage} = useContext(AuthContext);
 
     const initVal = { email:'', password:'' };
     const { register, formState: { errors }, handleSubmit } = useForm<TLogin>({defaultValues: initVal});
 
-
-    const login: SubmitHandler<TLogin> = async(formVal) => {
-        errMessage && setErrMessage("");
-
-        try {
-            const {data: { success, payload } } = await axiosPrivate.post('/login', formVal);
-            if(success){
-                setAuthUser(payload);
-                router.push('/');
-            } 
-        }catch(err) {
-            const error = err as AxiosError<Error>;
-            setErrMessage(error?.response?.data.message!);
-            setTimeout(() => setErrMessage(""),1000);
-        }
-
-    }
+    const login: SubmitHandler<TLogin> = async(formVal) => await handleLogin(formVal)
     
     return ( 
         <section className="mt-10">

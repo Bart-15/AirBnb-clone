@@ -13,7 +13,7 @@ const MultiCheckBox = ({options, selected, onChange}: MultiCheckBoxProps) => {
     useEffect(() => {
         if(options?.length === selected.length) return setCheckedAll(true);
     }, [options])
-
+ 
     function handleClick(event:  React.FormEvent<HTMLInputElement>): void{
         let uptList : string[] = [...selected]
 

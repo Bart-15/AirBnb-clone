@@ -36,8 +36,8 @@ const SinglePlace = () => {
                             <div dangerouslySetInnerHTML={{__html: place?.description!}}></div>
                         </div>
                         <div className="my-4">
-                            <p>Check-in: {format24hto12h(place?.checkIn!)}</p>
-                            <p>Check-out: {format24hto12h(place?.checkOut!)}</p>
+                            <p>Check-in: {format24hto12h(place?.checkIn as string)}</p>
+                            <p>Check-out: {format24hto12h(place?.checkOut as string)}</p>
                             <p>Max number of guests: {place?.maxGuests}</p>
                         </div>
                     </div>

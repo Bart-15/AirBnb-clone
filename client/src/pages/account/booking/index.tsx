@@ -10,7 +10,7 @@ import { AxiosError } from 'axios';
 
 const Bookings = () => {
     const router = useRouter();
-    const { ready, authUser, setAuthUser } = useContext(AuthContext)
+    const { ready, authUser } = useContext(AuthContext)
     const [error, setError] = useState<AxiosError | null>(null)
 
     const { data: bookings, refetch } = useQuery<IBooking[], Error>(["bookings"], () => fetchUserBookings(), {

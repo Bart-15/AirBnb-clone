@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { useQuery } from 'react-query';
+import { useQuery, useMutation, UseMutationResult, useQueryClient } from 'react-query';
 import { useRouter } from 'next/router';
 import { TFormPlaceInput as TPlace, Error } from "@/types/forms.types";
 import { AuthContext } from "@/context/authContext";
@@ -10,22 +10,41 @@ import useModal from "@/hooks/useModal";
 import Modal from "@/components/Modal";
 import UploadPhotos from "@/components/UploadPhotos";
 import { axiosPrivate } from "@/utils/axios";
-import { AxiosError } from "axios";
+
+const deletePlace = async(id:string): Promise<void> => {
+    const res = await axiosPrivate.delete(`/place/${id}`);
+
+    if(res.data.success) {
+        return res.data;
+    }
+
+    throw new Error("Error delete booking")
+}
 
 const Places = () => {
+    const queryClient = useQueryClient();
     const router = useRouter();
 
     const { ready, authUser } = useContext(AuthContext);
     const { isShown, toggle } = useModal();
     const [placeId, setPlaceId] = useState<string>("");
     const [existingImgs, setExistingImgs] = useState<string[] | null>([]);
-    const [error, setError] = useState<Error | undefined>();
 
-    const { data: places, refetch } = useQuery<TPlace[], Error>(["places"], () => fetchUserPlace(), {
+    const { data: places } = useQuery<TPlace[], Error>(["places"], () => fetchUserPlace(), {
         enabled:!!authUser,
         keepPreviousData:true,
         refetchOnWindowFocus:false,
     })
+
+    const mutation: UseMutationResult<void, Error, string> = useMutation<void, Error, string>(deletePlace, {
+        onSuccess: (data) => {
+            queryClient.invalidateQueries('places');
+        },
+        onError:(error:Error) => {
+            return console.log(error);
+        },
+    })
+
 
     if(!ready) {
         return (<p className="text-center mt-20">Loading ...</p>)
@@ -33,16 +52,8 @@ const Places = () => {
 
     if(ready && !authUser) router.push('/login')
 
-    async function handleDelete(id:string) {
-        try {
-            const {data} = await axiosPrivate.delete(`/place/${id}`);
-            if(data.success) return refetch();
-        }catch(err) {
-            const error = err as AxiosError<Error>;
-            setError(error?.response?.data);
-        }
-    }
- 
+    const handleDelete = async(id:string) => await mutation.mutateAsync(id);
+
     function handleToggle(id:string, images: string[] | null){
         toggle();
         setPlaceId(id)

@@ -8,8 +8,8 @@ export type TFormPlaceInput = {
     images?:string[];
     checkOut:string;
     perks:string[];
-    maxGuests:string;
-    price:string;
+    maxGuests:string | number;
+    price:string | number;
 }
 
 export type TPerks = {

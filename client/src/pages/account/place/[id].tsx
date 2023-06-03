@@ -62,7 +62,7 @@ const AddPlace = () => {
 
     const onSubmit = async(formVal: TFormPlaceInput) => {
         
-        let newData = { ...formVal, perks:selectedPerks, maxGuests: parseInt(formVal.maxGuests), price: parseInt(formVal.price) }
+        let newData = { ...formVal, perks:selectedPerks, maxGuests: parseInt(formVal.maxGuests as string), price: parseInt(formVal.price as string) }
 
         try {
             const { data } = await axiosPrivate.patch(`/place/${id}`, newData);

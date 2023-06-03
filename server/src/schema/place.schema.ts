@@ -10,7 +10,7 @@ export const createPlaceSchema = object({
         description: string().trim().min(1, {message: "Description is required."}),
         small_description: string().trim().min(1, {message: "Small description is required."}),
         checkIn: string().trim().min(1, {message: "Checkin is required."}),
-        checkOut: string().trim().min(1, {message: "Checkin is required."}),
+        checkOut: string().trim().min(1, {message: "Checkout is required."}),
         maxGuests: number().positive(),
         price: number().positive(),
     })

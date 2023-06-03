@@ -6,11 +6,11 @@ import { useForm } from "react-hook-form";
 import { TFormPlaceInput, TPerks, Error } from '@/types/forms.types';
 import { axiosPrivate } from '@/utils/axios';
 import { fetchPerks } from '@/queries/place.queries';
-import { useQuery } from 'react-query';
+import { useQuery, useMutation, UseMutationResult } from 'react-query';
 import MultiCheckBox from '@/components/MultiCheckbox';
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 import 'react-quill/dist/quill.snow.css';
-import { AxiosError } from 'axios';
+import { AxiosResponse } from 'axios';
 
 
 const initVal = {
@@ -24,16 +24,26 @@ const initVal = {
     price:''
 }
 
+const createPlace = async(input:TFormPlaceInput): Promise<TFormPlaceInput> => {
+    const res: AxiosResponse = await axiosPrivate.post('/place', input);
+
+    if(res.data.success) {
+        return res.data;
+    }
+
+    throw new Error("Error create booking");
+}
+
 const AddPlace = () => {
+
     const router = useRouter();
 
     const [ selectedPerks, setSelectedPerks ] = useState<string[]>([])
-    const [error, setError] = useState<Error | undefined>();
     
     const { ready, authUser } = useContext(AuthContext);
     
     const { register, watch, setValue, formState: { errors }, handleSubmit } = useForm<TFormPlaceInput>({defaultValues:initVal});
-    
+
     useEffect(() => {
         register("description", { required: "Description is required", minLength: 15 });
     }, [register])
@@ -43,7 +53,20 @@ const AddPlace = () => {
         keepPreviousData:true,
         refetchOnWindowFocus:false,
     })
-    
+
+    const mutation: UseMutationResult<TFormPlaceInput, Error, TFormPlaceInput> = useMutation<TFormPlaceInput, Error, TFormPlaceInput>(
+        async(input:TFormPlaceInput) => createPlace(input), {
+            onSuccess:(data: TFormPlaceInput, _variables:TFormPlaceInput) => {
+                return router.push('/account/place')
+            },
+            onError:(error:Error) => {
+                return console.log(error)
+            },
+        }
+    )
+
+    const editorContent = watch("description");
+
     if(!ready) {
         return (<p className="text-center mt-20">Loading ...</p>)
     }
@@ -54,19 +77,9 @@ const AddPlace = () => {
         setValue("description", editorState)
     };
 
-    const editorContent = watch("description");
-
     const onSubmit = async(formVal: TFormPlaceInput) => {
-        
-        let newData = { ...formVal, perks:selectedPerks, maxGuests: parseInt(formVal.maxGuests), price: parseInt(formVal.price) }
-
-        try {
-            const { data } = await axiosPrivate.post('/place', newData);
-            if(data.success) return router.push('/account/place')
-        }catch(err){
-            const error = err as AxiosError<Error>;
-            setError(error?.response?.data);
-        }
+        let newData = { ...formVal, perks:selectedPerks, maxGuests: parseInt(formVal.maxGuests as string), price: parseInt(formVal.price as string) }
+        await mutation.mutateAsync(newData);
     }
     
     return ( 

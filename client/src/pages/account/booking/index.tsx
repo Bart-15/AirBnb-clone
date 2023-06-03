@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery, useMutation, UseMutationResult, useQueryClient } from 'react-query';
 import AccountNav from "@/components/AcountNav";
 import { AuthContext } from '@/context/authContext';
 import { useRouter } from 'next/router';
@@ -8,15 +8,35 @@ import { fetchUserBookings } from '@/queries/booking.queries';
 import { axiosPrivate } from '@/utils/axios';
 import { AxiosError } from 'axios';
 
+const deletePlace = async(id:string): Promise<void> => {
+    const res = await axiosPrivate.delete(`/booking/${id}`);
+
+    if(res.data.success) {
+        return res.data;
+    }
+
+    throw new Error("Error delete Place")
+}
+
 const Bookings = () => {
     const router = useRouter();
-    const { ready, authUser } = useContext(AuthContext)
-    const [error, setError] = useState<AxiosError | null>(null)
+    const queryClient = useQueryClient();
 
-    const { data: bookings, refetch } = useQuery<IBooking[], Error>(["bookings"], () => fetchUserBookings(), {
+    const { ready, authUser } = useContext(AuthContext);
+    
+    const { data: bookings } = useQuery<IBooking[], Error>(["bookings"], () => fetchUserBookings(), {
         enabled:!!authUser,
         keepPreviousData:true,
         refetchOnWindowFocus:false,
+    })
+
+    const mutation: UseMutationResult<void, Error, string> = useMutation<void, Error, string>(deletePlace, {
+        onSuccess: (data) => {
+            queryClient.invalidateQueries('bookings');
+        },
+        onError:(error:Error) => {
+            return console.log(error);
+        },
     })
 
     if(!ready) {
@@ -25,15 +45,8 @@ const Bookings = () => {
 
     if(ready && !authUser) router.push('/login')
 
-    async function deleteBooking(id: string) {
-        try {
-            const {data} = await axiosPrivate.delete(`/booking/${id}`);
-            if(data.success) return refetch();
-        }catch(err) {
-            const error = err as AxiosError<Error>;
-            setError(error);
-        }
-    }
+    const deleteBooking = async (id: string) => await mutation.mutateAsync(id)
+
     return ( 
         <div className="mt-20">
             <AccountNav />
